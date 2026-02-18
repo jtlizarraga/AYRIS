@@ -9,15 +9,12 @@ export const supabase = createClient({
   anonKey: supabaseKey
 });
 
-// Helper para obtener usuario actual
+// Helper para obtener sesión actual (reemplaza getCurrentUser que no existe en el SDK)
 export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getCurrentUser();
-  return { user: data?.user || null, error };
-};
-
-// Helper para rutas protegidas
-export const requireAuth = async () => {
-  const { user, error } = await getCurrentUser();
-  if (!user || error) throw new Error('Unauthorized');
-  return user;
+  try {
+    const { data, error } = await (supabase as any).auth.getCurrentSession();
+    return { user: data?.session?.user || null, error };
+  } catch (err) {
+    return { user: null, error: err };
+  }
 };

@@ -16,14 +16,14 @@ export const useAdminStats = () => {
             setLoading(true);
 
             // 1. Total Users
-            const { count: usersCount, error: usersError } = await supabase
+            const { count: usersCount, error: usersError } = await (supabase as any).database
                 .from('profiles')
                 .select('*', { count: 'exact', head: true });
 
             if (usersError) throw usersError;
 
             // 2. Active Models
-            const { count: modelsCount, error: modelsError } = await supabase
+            const { count: modelsCount, error: modelsError } = await (supabase as any).database
                 .from('models')
                 .select('*', { count: 'exact', head: true })
                 .eq('is_available', true);
@@ -31,21 +31,21 @@ export const useAdminStats = () => {
             if (modelsError) throw modelsError;
 
             // 3. Total Bookings (This month - simplified to all for now or logic can be added)
-            const { count: bookingsCount, error: bookingsError } = await supabase
+            const { count: bookingsCount, error: bookingsError } = await (supabase as any).database
                 .from('bookings')
                 .select('*', { count: 'exact', head: true });
 
             if (bookingsError) throw bookingsError;
 
             // 4. Revenue (Requires fetching data to sum)
-            const { data: revenueData, error: revenueError } = await supabase
+            const { data: revenueData, error: revenueError } = await (supabase as any).database
                 .from('bookings')
                 .select('agreed_rate')
                 .neq('booking_status', 'cancelled'); // Count valid bookings
 
             if (revenueError) throw revenueError;
 
-            const totalRevenue = revenueData?.reduce((acc, curr) => acc + (curr.agreed_rate || 0), 0) || 0;
+            const totalRevenue = revenueData?.reduce((acc: number, curr: any) => acc + (curr.agreed_rate || 0), 0) || 0;
 
             setStats({
                 totalUsers: usersCount || 0,

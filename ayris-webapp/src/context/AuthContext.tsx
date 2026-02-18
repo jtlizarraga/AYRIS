@@ -50,20 +50,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }, 5000);
 
             try {
-                // Try getCurrentUser which is often more reliable for initial check
-                const { data, error }: any = await supabase.auth.getCurrentUser();
-                console.log("Global user check result:", { data, error });
+                // El SDK usa getCurrentSession para restaurar la sesión
+                const { data, error }: any = await (supabase as any).auth.getCurrentSession();
+                console.log("Global session check result:", { data, error });
 
-                if (data?.user) {
-                    setUser(data.user);
-                    await fetchProfile(data.user.id);
-                } else {
-                    // Fallback to getCurrentSession if user is not immediately available
-                    const { data: sessionData }: any = await supabase.auth.getCurrentSession();
-                    if (sessionData?.session?.user) {
-                        setUser(sessionData.session.user);
-                        await fetchProfile(sessionData.session.user.id);
-                    }
+                if (data?.session?.user) {
+                    setUser(data.session.user);
+                    await fetchProfile(data.session.user.id);
                 }
             } catch (err) {
                 console.error("Global Auth init error:", err);

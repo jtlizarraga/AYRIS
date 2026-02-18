@@ -5,26 +5,21 @@ export const useStorage = () => {
         try {
             const fileName = `${modelId}/${Date.now()}_${file.name}`;
 
-            const { data, error } = await supabase.storage
+            const { data, error } = await (supabase as any).storage
                 .from('model-portfolios')
                 .upload(fileName, file);
 
             if (error) throw error;
 
-            // Obtener URL pública
-            const { data: urlData } = supabase.storage
-                .from('model-portfolios')
-                .getPublicUrl(fileName);
-
             return {
                 data: {
-                    path: fileName,
-                    url: urlData.publicUrl
+                    path: data.key,
+                    url: data.url
                 },
                 error: null
             };
         } catch (err: any) {
-            return { data: null, error: err.message };
+            return { data: null, error: err.message || err };
         }
     };
 
@@ -32,38 +27,34 @@ export const useStorage = () => {
         try {
             const fileName = `${userId}/avatar_${Date.now()}.jpg`;
 
-            const { data, error } = await supabase.storage
+            const { data, error } = await (supabase as any).storage
                 .from('profile-avatars')
                 .upload(fileName, file);
 
             if (error) throw error;
 
-            const { data: urlData } = supabase.storage
-                .from('profile-avatars')
-                .getPublicUrl(fileName);
-
             return {
                 data: {
-                    path: fileName,
-                    url: urlData.publicUrl
+                    path: data.key,
+                    url: data.url
                 },
                 error: null
             };
         } catch (err: any) {
-            return { data: null, error: err.message };
+            return { data: null, error: err.message || err };
         }
     };
 
     const deleteFile = async (bucket: string, filePath: string) => {
         try {
-            const { error } = await supabase.storage
+            const { error } = await (supabase as any).storage
                 .from(bucket)
-                .remove([filePath]);
+                .remove(filePath);
 
             if (error) throw error;
             return { success: true, error: null };
         } catch (err: any) {
-            return { success: false, error: err.message };
+            return { success: false, error: err.message || err };
         }
     };
 

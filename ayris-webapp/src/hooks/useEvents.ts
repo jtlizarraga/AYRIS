@@ -12,7 +12,7 @@ export const useEvents = (userId?: string) => {
 
         try {
             setLoading(true);
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any).database
                 .from('events')
                 .select('*')
                 .eq('client_id', userId)
@@ -30,7 +30,7 @@ export const useEvents = (userId?: string) => {
     const createEvent = async (eventData: Partial<Event>) => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any).database
                 .from('events')
                 .insert([eventData])
                 .select()
