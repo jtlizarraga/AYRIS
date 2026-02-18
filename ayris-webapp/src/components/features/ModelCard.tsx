@@ -2,30 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../ui/Card';
 
+import { Model } from '../../types/database';
+
 interface ModelCardProps {
-    model: {
-        id: string;
-        stage_name: string;
-        bio: string | null;
-        category: string[];
-        day_rate: number;
-        is_available: boolean;
-        featured: boolean;
-        profile?: {
-            avatar_url: string | null;
-        };
-        portfolio?: Array<{
-            image_url: string;
-            image_type: string;
-        }>;
-    };
+    model: Model;
 }
 
 const ModelCard: React.FC<ModelCardProps> = ({ model }) => {
     const navigate = useNavigate();
 
-    const profileImage = model.portfolio?.find(p => p.image_type === 'profile')?.image_url
-        || model.profile?.avatar_url
+    const profileImage = (model as any).portfolio?.find((p: any) => p.image_type === 'profile')?.image_url
+        || (model as any).profile?.avatar_url
         || 'https://via.placeholder.com/300x400?text=No+Image';
 
     return (
@@ -84,7 +71,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ model }) => {
             </p>
 
             <div style={{ display: 'flex', gap: 'var(--spacing-1)', marginBottom: 'var(--spacing-2)', flexWrap: 'wrap' }}>
-                {model.category.map((cat, index) => (
+                {(model.category || []).map((cat, index) => (
                     <span key={index} style={{
                         backgroundColor: 'var(--gray-100)',
                         color: 'var(--gray-700)',
@@ -102,7 +89,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ model }) => {
                     fontSize: 'var(--font-size-sm)',
                     color: 'var(--gray-600)'
                 }}>
-                    ${model.day_rate.toLocaleString()}/día
+                    ${(model.day_rate || 0).toLocaleString()}/día
                 </span>
                 <span style={{
                     color: model.is_available ? 'var(--color-success)' : 'var(--color-error)',
